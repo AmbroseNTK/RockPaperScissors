@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rock - Paper - Scissor</title>
+    <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+
+<body>
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <input id="tbPlayer" type="text" placeholder="Tên bạn" style="margin:1%;">
+            <label class="col-form-label" style="margin:1%;">Đấu với</label>
+            <input id="tbEnemy" type="text" placeholder="Tên đối thủ" style="margin:1%;">
+        </div>
+    </div>
+    <div class="row" style="width:100%;margin:1%;">
+        <div class="col">
+            <button id="btRock" onclick="clickChoise('rock')">
+                <img src="assets/img/rock.png" width="20%"> </button>
+        </div>
+        <div class="col">
+            <button id="btPaper" onclick="clickChoise('paper')">
+                <img src="assets/img/paper.png" width="20%">
+            </button>
+        </div>
+        <div class="col">
+            <button id="btScissor" onclick="clickChoise('scissor')">
+                <img src="assets/img/scissor.png" width="20%">
+            </button>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col d-flex justify-content-center">
+            <button id="btPlayAgain" class="btn btn-primary" type="button" style="width:100%;margin:1%;">Chơi lại</button>
+        </div>
+    </div>
+
+    <script src="assets/js/jquery.min.js"></script>
+    <script src="assets/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.0.4/firebase.js"></script>
+    <script>
+        var config = {
+            apiKey: "AIzaSyBmiaOIa9FVQi2Rki3XYzmpwbK4lJHrZV8",
+            authDomain: "rock-paper-scissors-aff6b.firebaseapp.com",
+            databaseURL: "https://rock-paper-scissors-aff6b.firebaseio.com",
+            storageBucket: "rock-paper-scissors-aff6b.appspot.com"
+        };
+
+        firebase.initializeApp(config);
+        var database = firebase.database();
+        var playerName = $('#tbPlayer').val();
+        var enemyName = $("#tbEnemy").val();
+        var choise = "";
+
+        function clickChoise(choise) {
+            playerName = $('#tbPlayer').val();
+            enemyName = $("#tbEnemy").val();
+            database.ref('player/' + playerName).set({ 'choise': choise });
+            this.choise = choise;
+        }
+
+        $('#btPlayAgain').on('click', () => {
+            playerName = $('#tbPlayer').val();
+            enemyName = $("#tbEnemy").val();
+            database.ref('player/' + playerName).remove();
+            database.ref('player/' + enemyName).remove();
+            enemyChoise="";
+            this.choise="";
+            setInterval(update);
+        })
+
+        var enemyChoise = "";
+
+        var update = setInterval(() => {
+            playerName = $('#tbPlayer').val();
+            enemyName = $("#tbEnemy").val();
+            if (playerName != '' && enemyName != '') {
+                database.ref('player/' + enemyName + '/choise/').on('value', (snapshot) => {
+                    if (snapshot != null) {
+                        enemyChoise = snapshot.val();
+                        if (choise == 'rock') {
+                            if (enemyChoise == 'paper') {
+                                alert(enemyName + ' thắng');
+                                clearInterval(update);
+                            }
+                            else if (enemyChoise == 'scissor') {
+                                alert('Bạn thắng');
+                                clearInterval(update);
+                            }
+                            else {
+                                alert('Hòa nhau');
+                                clearInterval(update);
+                            }
+
+                        }
+                        else if (choise == 'paper') {
+                            if (enemyChoise == 'paper') {
+                                alert('Hòa nhau');
+                                clearInterval(update);
+                            }
+                            else if (enemyChoise == 'scissor') {
+                                alert(enemyName + ' thắng');
+                                clearInterval(update);
+                            }
+                            else {
+                                alert('Bạn thắng');
+                                clearInterval(update);
+                            }
+                        }
+                        else if (choise == 'scissor') {
+                            if (enemyChoise == 'paper') {
+                                alert('Bạn thắng');
+                                clearInterval(update);
+                            }
+                            else if (enemyChoise == 'scissor') {
+                                alert(enemyName + ' thắng');
+                                clearInterval(update);
+                            }
+                            else {
+                                alert('Hòa nhau');
+                                clearInterval(update);
+                            }
+                        }
+
+
+
+                    }
+                });
+            }
+        }, 1000);
+
+
+
+
+    </script>
+
+
+</body>
+
+</html>
